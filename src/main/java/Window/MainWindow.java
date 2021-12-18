@@ -86,4 +86,7 @@ public class MainWindow {
     }
     public long getWidth() {return windowWidth;}
     public long getHeight() {return windowHeight;}
+    public void swapBuffer() {
+        glfwSwapBuffers(window);
+    }
 }

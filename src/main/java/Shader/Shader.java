@@ -34,6 +34,9 @@ public class Shader {
         glDetachShader(programID, vertexShaderProgram);
         glDetachShader(programID, fragmentShaderProgram);
 
+        glDeleteShader(vertexShaderProgram);
+        glDeleteShader(fragmentShaderProgram);
+
         if (glGetProgrami(programID, GL_LINK_STATUS) == 0) {
             System.out.printf("Shader program link error: %s\n", glGetProgramInfoLog(programID));
             throw new Exception("Shader program link error");

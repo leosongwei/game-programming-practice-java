@@ -1,12 +1,13 @@
-package Test_01_Triangle;
+package Test_01_Quad;
 
 import org.lwjgl.glfw.GLFW;
+
 import static org.lwjgl.opengl.GL46.*;
 
 import Window.MainWindow;
 import Shader.Shader;
 
-public class Triangle {
+public class Quad {
 
     private static int shaderSetup() throws Exception {
         String vertexShader = """
@@ -25,14 +26,41 @@ public class Triangle {
                 color = vec3(1,0,0); // red
                 }
                 """;
-        return Shader.createProgramWithShaderStrings(vertexShader, fragmentShader);
+        int program = Shader.createProgramWithShaderStrings(vertexShader, fragmentShader);
+        glUseProgram(program);
+        return program;
     }
 
     private static void renderModelSetup() {
+        float[] vertices = {
+                0.5f, 0.5f,
+                0.5f, -0.5f,
+                -0.5f, -0.5f,
+                -0.5f, 0.5f
+        };
+        int[] eboIndices = {0, 1, 3, 1, 2, 3};
 
+        int vertexArray = glGenVertexArrays();
+        glBindVertexArray(vertexArray);
+
+        int vertexBuffer = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+
+        int ebo = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, eboIndices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * 4, 0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(vertexArray);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
     private static void render() {
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     }
 
@@ -40,14 +68,18 @@ public class Triangle {
         MainWindow mainWindow = new MainWindow(640, 480);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        try{
+        try {
             int program = shaderSetup();
+            renderModelSetup();
+
             System.out.printf("Program: %d\n", program);
 
-            while ( !GLFW.glfwWindowShouldClose(mainWindow.getWindow()) ) {
+            while (!GLFW.glfwWindowShouldClose(mainWindow.getWindow())) {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-                GLFW.glfwSwapBuffers(mainWindow.getWindow()); // swap the color buffers
+                render();
+
+                mainWindow.swapBuffer();
 
                 // Poll for window events. The key callback above will only be
                 // invoked during this call.
