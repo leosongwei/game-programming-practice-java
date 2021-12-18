@@ -1,11 +1,11 @@
-package Test_01_Quad;
+package test01quad;
 
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.opengl.GL46.*;
 
-import Window.MainWindow;
-import Shader.Shader;
+import window.MainWindow;
+import shader.Shader;
 
 public class Quad {
 

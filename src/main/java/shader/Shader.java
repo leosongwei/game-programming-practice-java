@@ -1,4 +1,4 @@
-package Shader;
+package shader;
 
 import static org.lwjgl.opengl.GL46.*;
 
