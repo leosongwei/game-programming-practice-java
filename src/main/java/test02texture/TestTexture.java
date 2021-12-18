@@ -12,20 +12,25 @@ public class TestTexture {
     private static int shaderSetup() throws Exception {
         String vertexShader = """
                 #version 330 core
-                layout(location = 0) in vec2 vertexPosition_modelspace;
+                layout(location = 0) in vec2 modelCoord;
+                layout(location = 1) in vec2 texCoord;
+                out vec2 fragTexCoord;
                 void main(){
-                    gl_Position.xy = vertexPosition_modelspace;
+                    fragTexCoord = texCoord;
+                    gl_Position.xy = modelCoord;
                     gl_Position.z = 0.0;
                     gl_Position.w = 1.0;
                 }
-                """;
+                                """;
         String fragmentShader = """
                 #version 330 core
+                uniform sampler2D quadTexture;
+                in vec2 fragTexCoord;
                 out vec3 color;
                 void main(){
-                color = vec3(1,0,0); // red
+                    color = vec3(texture(quadTexture, fragTexCoord));
                 }
-                """;
+                                """;
         int program = Shader.createProgramWithShaderStrings(vertexShader, fragmentShader);
         glUseProgram(program);
         return program;
@@ -33,12 +38,13 @@ public class TestTexture {
 
     private static void renderModelSetup() {
         float[] vertices = {
-                0.5f, 0.5f,
-                0.5f, -0.5f,
-                -0.5f, -0.5f,
-                -0.5f, 0.5f
+                // x, y, u, v
+                -0.9f, 0.9f, 0.0f, 1.0f,
+                0.9f, 0.9f, 1.0f, 1.0f,
+                -0.9f, -0.9f, 0.0f, 0.0f,
+                0.9f, -0.9f, 1.0f, 0.0f
         };
-        int[] eboIndices = {0, 1, 3, 1, 2, 3};
+        int[] eboIndices = {0, 3, 1, 0, 2, 3};
 
         int vertexArray = glGenVertexArrays();
         glBindVertexArray(vertexArray);
@@ -51,12 +57,14 @@ public class TestTexture {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, eboIndices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * 4, 0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * 4, 0);
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 4 * 4, 2 * 4);
+        glEnableVertexAttribArray(1);
 
         glBindVertexArray(vertexArray);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     private static void render() {
@@ -72,7 +80,9 @@ public class TestTexture {
             int program = shaderSetup();
             renderModelSetup();
             System.out.printf("Program: %d\n", program);
-            Texture texture = new Texture("wood_square.png");
+            Texture texture = new Texture("th06.png");
+            texture.bind(GL_TEXTURE0);
+            glUniform1i(glGetUniformLocation(program, "quadTexture"),0);
 
             while (!GLFW.glfwWindowShouldClose(mainWindow.getWindow())) {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer

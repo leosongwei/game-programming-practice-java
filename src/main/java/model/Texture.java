@@ -22,6 +22,7 @@ public class Texture {
         byte[] bytes = resource.getAsBytes(filepath);
         ByteBuffer fileBuffer = MemoryUtil.memAlloc(bytes.length);
         fileBuffer.put(0, bytes);
+        STBImage.stbi_set_flip_vertically_on_load(true);
         ByteBuffer buffer = STBImage.stbi_load_from_memory(fileBuffer, xRef, yRef, channels_in_file, 3);
         MemoryUtil.memFree(fileBuffer);
         if (buffer == null) {
