@@ -6,7 +6,7 @@ import model.Texture;
 
 public class Square implements Shape {
     private final float[] vertices;
-    private final float[] indices;
+    private final int[] indices;
 
     public Square(float w) {
         vertices = new float[]{
@@ -16,14 +16,14 @@ public class Square implements Shape {
                 0.0f, 0.0f, 0.0f,    0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
                 w, 0.0f, 1.0f,       0.0f, 0.0f, -1.0f, 1.0f, 0.0f
         };
-        indices = new float[]{0, 3, 1, 0, 2, 3};
+        indices = new int[]{0, 3, 1, 0, 2, 3};
     }
 
     public float[] getVertices() {
         return vertices;
     }
 
-    public float[] getIndices() {
+    public int[] getIndices() {
         return indices;
     }
 }

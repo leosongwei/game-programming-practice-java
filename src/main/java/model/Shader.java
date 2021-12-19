@@ -17,6 +17,10 @@ public class Shader {
         glUseProgram(programID);
     }
 
+    public int getUniformLocation(String name) {
+        return glGetUniformLocation(programID, name);
+    }
+
     private static int compileShaderFromString(int shaderType, String shaderProgram) throws Exception {
         int shaderID = glCreateShader(shaderType);
         if (shaderID == 0) {
