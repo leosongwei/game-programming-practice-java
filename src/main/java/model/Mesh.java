@@ -3,10 +3,10 @@ package model;
 import static org.lwjgl.opengl.GL46.*;
 
 public class Mesh {
-    private float[] vertices; // n*8: x,y,z,nx,ny,nz,u,v
-    private int[] indices;
-    private Texture texture;
-    private Shader shader;
+    private final float[] vertices; // n*8: x,y,z,nx,ny,nz,u,v
+    private final int[] indices;
+    private final Texture texture;
+    private final Shader shader;
     private int vao;
     private int vbo;
     private int ebo;
@@ -40,6 +40,12 @@ public class Mesh {
         // bind u, v
         glVertexAttribPointer(2, 2, GL_FLOAT, false, size, 6 * 4);
         glEnableVertexAttribArray(2);
+    }
+
+    public void unload() {
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(vbo);
+        glDeleteBuffers(ebo);
     }
 
     public void draw() {
