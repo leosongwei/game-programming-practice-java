@@ -46,6 +46,10 @@ public class MainWindow {
                 glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
         });
 
+        glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
+            glViewport(0,0, w, h);
+        });
+
         // Get the thread stack and push a new frame
         try ( MemoryStack stack = stackPush() ) {
             IntBuffer pWidth = stack.mallocInt(1); // int*

@@ -10,7 +10,7 @@ import window.MainWindow;
 
 import static org.lwjgl.opengl.GL46.*;
 
-public class TestShapes {
+public class TestShapesSquare {
     private static Shader shaderSetup() throws Exception {
         String vertexShader = """
                 #version 330 core
