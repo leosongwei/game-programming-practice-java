@@ -15,6 +15,7 @@ public class MainWindow {
     private final long window;
     private int windowWidth;
     private int windowHeight;
+    private double swappedTime;
 
     public MainWindow(int width, int height) {
         windowWidth = width;
@@ -25,7 +26,7 @@ public class MainWindow {
         GLFWErrorCallback.createPrint(System.err).set();
 
         // Initialize GLFW. Most GLFW functions will not work before doing this.
-        if ( !glfwInit() )
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure GLFW
@@ -37,21 +38,23 @@ public class MainWindow {
 
         // Create the window
         window = glfwCreateWindow(windowWidth, windowHeight, "Hello World!", NULL, NULL);
-        if ( window == NULL )
+        if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
         });
 
         glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
-            glViewport(0,0, w, h);
+            glViewport(0, 0, w, h);
+            windowWidth = w;
+            windowHeight = h;
         });
 
         // Get the thread stack and push a new frame
-        try ( MemoryStack stack = stackPush() ) {
+        try (MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1); // int*
             IntBuffer pHeight = stack.mallocInt(1); // int*
 
@@ -81,14 +84,34 @@ public class MainWindow {
 
         glClearColor(0.1f, 0.1f, 0.0f, 1.0f);
         glViewport(0, 0, windowWidth, windowHeight);
+        glEnable(GL_DEPTH_TEST);
+
+        swappedTime = glfwGetTime();
     }
 
     public long getWindow() {
         return window;
     }
-    public long getWidth() {return windowWidth;}
-    public long getHeight() {return windowHeight;}
-    public void swapBuffer() {
+
+    public int getWidth() {
+        return windowWidth;
+    }
+
+    public int getHeight() {
+        return windowHeight;
+    }
+
+    public void swapBuffer() throws InterruptedException {
+        double aimingFrameRate = 1.0 / 60.0;
+        double time = glfwGetTime();
+        double needSleep = aimingFrameRate - (time - swappedTime);
+        if (needSleep > 0) {
+            Thread.sleep((long) (needSleep * 1000));
+        }
         glfwSwapBuffers(window);
+        swappedTime = glfwGetTime();
+        if (swappedTime > 10000) {
+            glfwSetTime(0.0);
+        }
     }
 }

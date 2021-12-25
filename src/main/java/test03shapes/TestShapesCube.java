@@ -3,10 +3,15 @@ package test03shapes;
 import model.Mesh;
 import model.Shader;
 import model.Texture;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryStack;
 import shapes.Cube;
 import shapes.Shape;
 import window.MainWindow;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL46.*;
 
@@ -18,11 +23,14 @@ public class TestShapesCube {
                 layout(location = 1) in vec3 normal;
                 layout(location = 2) in vec2 uv;
                 
+                uniform mat4 projectionLook;
+                uniform mat4 modelTransform;
+                
                 out vec2 uvCoord;
                 
                 void main(){
                     uvCoord = uv;
-                    gl_Position.xyz = position;
+                    gl_Position = projectionLook * modelTransform * vec4(position, 1.0);
                 }
                                 """;
         String fragmentShader = """
@@ -65,7 +73,45 @@ public class TestShapesCube {
             Shader shader = shaderSetup();
             Mesh mesh = setupMesh(shader);
 
+            Vector3f eyePosition = new Vector3f(0.0f, 0.0f, 10.0f);
+            Matrix4f projectionLook = new Matrix4f().perspective(
+                    (float)Math.toRadians(40.0),
+                    ((float)mainWindow.getWidth()) / ((float)mainWindow.getHeight()),
+                    0.1f,
+                    200.0f
+            ).lookAt(
+                    eyePosition,
+                    new Vector3f(0.0f, 0.0f, 0.0f),
+                    new Vector3f(0.0f, 1.0f, 0.0f)
+            );
+            System.out.println(projectionLook);
+
+            float angle = 0.0f;
+
             while (!GLFW.glfwWindowShouldClose(mainWindow.getWindow())) {
+                try (MemoryStack stack = MemoryStack.stackPush()) {
+                    FloatBuffer perspectiveMatrix = projectionLook.get(stack.mallocFloat(16));
+                    glUniformMatrix4fv(
+                            shader.getUniformLocation("projectionLook"),
+                            false,
+                            perspectiveMatrix
+                    );
+
+                    angle = (angle + 1f) % 360.0f;
+
+                    Vector3f translation = new Vector3f(0f, 0f, 2f).rotateY((float)Math.toRadians(angle));
+
+                    FloatBuffer boxTranslation = new Matrix4f()
+                            .translation(translation)
+                            .get(stack.mallocFloat(16));
+
+                    glUniformMatrix4fv(
+                            shader.getUniformLocation("modelTransform"),
+                            false,
+                            boxTranslation
+                    );
+                }
+
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
                 mesh.bind();
