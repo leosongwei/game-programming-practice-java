@@ -11,6 +11,7 @@ import window.MainWindow;
 import static org.lwjgl.opengl.GL46.*;
 
 public class TestShapesSquare {
+    // https://learnopengl-cn.github.io/02%20Lighting/04%20Lighting%20maps/
     private static Shader shaderSetup() throws Exception {
         String vertexShader = """
                 #version 330 core
