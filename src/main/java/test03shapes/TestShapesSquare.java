@@ -3,6 +3,7 @@ package test03shapes;
 import model.Shader;
 import model.Mesh;
 import model.Texture;
+import model.TexturePack;
 import org.lwjgl.glfw.GLFW;
 import shapes.Square;
 import shapes.Shape;
@@ -28,22 +29,22 @@ public class TestShapesSquare {
                                 """;
         String fragmentShader = """
                 #version 330 core
-                uniform sampler2D diffuseTexture;
+                uniform sampler2D TEXTURE0;
                 
                 in vec2 uvCoord;
                 
                 out vec3 color;
                 
                 void main(){
-                    color = vec3(texture(diffuseTexture, uvCoord));
+                    color = vec3(texture(TEXTURE0, uvCoord));
                 }
                                 """;
         return new Shader(vertexShader, fragmentShader);
     }
 
-    private static Mesh setupMesh(Shader shader) {
+    private static Mesh setupMesh(Shader shader) throws Exception {
         Shape square = new Square(0.6f);
-        Texture texture = new Texture("th06.png");
+        TexturePack texture = new TexturePack(new String[]{"th06.png"});
         Mesh mesh = new Mesh(
                 square.getVertices(),
                 square.getIndices(),

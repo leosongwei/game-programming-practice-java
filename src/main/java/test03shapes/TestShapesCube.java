@@ -3,6 +3,7 @@ package test03shapes;
 import model.Mesh;
 import model.Shader;
 import model.Texture;
+import model.TexturePack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -35,22 +36,25 @@ public class TestShapesCube {
                                 """;
         String fragmentShader = """
                 #version 330 core
-                uniform sampler2D diffuseTexture;
+                uniform sampler2D TEXTURE0;
+                uniform sampler2D TEXTURE1;
                 
                 in vec2 uvCoord;
                 
                 out vec3 color;
                 
                 void main(){
-                    color = vec3(texture(diffuseTexture, uvCoord));
+                    vec3 color0 = vec3(texture(TEXTURE0, uvCoord));
+                    vec3 color1 = vec3(texture(TEXTURE1, uvCoord));
+                    color = color0 * uvCoord.x + color1 * (1-uvCoord.x);
                 }
                                 """;
         return new Shader(vertexShader, fragmentShader);
     }
 
-    private static Mesh setupMesh(Shader shader) {
+    private static Mesh setupMesh(Shader shader) throws Exception {
         Shape cube = new Cube();
-        Texture texture = new Texture("th06.png");
+        TexturePack texture = new TexturePack(new String[]{"th06.png", "container2.png"});
         Mesh mesh = new Mesh(
                 cube.getVertices(),
                 cube.getIndices(),
@@ -74,21 +78,21 @@ public class TestShapesCube {
             Mesh mesh = setupMesh(shader);
 
             Vector3f eyePosition = new Vector3f(0.0f, 0.0f, 10.0f);
-            Matrix4f projectionLook = new Matrix4f().perspective(
-                    (float)Math.toRadians(40.0),
-                    ((float)mainWindow.getWidth()) / ((float)mainWindow.getHeight()),
-                    0.1f,
-                    200.0f
-            ).lookAt(
-                    eyePosition,
-                    new Vector3f(0.0f, 0.0f, 0.0f),
-                    new Vector3f(0.0f, 1.0f, 0.0f)
-            );
-            System.out.println(projectionLook);
 
             float angle = 0.0f;
 
             while (!GLFW.glfwWindowShouldClose(mainWindow.getWindow())) {
+                Matrix4f projectionLook = new Matrix4f().perspective(
+                        (float)Math.toRadians(20.0),
+                        ((float)mainWindow.getWidth()) / ((float)mainWindow.getHeight()),
+                        0.1f,
+                        200.0f
+                ).lookAt(
+                        eyePosition,
+                        new Vector3f(0.0f, 0.0f, 0.0f),
+                        new Vector3f(0.0f, 1.0f, 0.0f)
+                );
+
                 try (MemoryStack stack = MemoryStack.stackPush()) {
                     FloatBuffer perspectiveMatrix = projectionLook.get(stack.mallocFloat(16));
                     glUniformMatrix4fv(

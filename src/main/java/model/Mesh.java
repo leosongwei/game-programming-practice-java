@@ -5,16 +5,16 @@ import static org.lwjgl.opengl.GL46.*;
 public class Mesh {
     private final float[] vertices; // n*8: x,y,z,nx,ny,nz,u,v
     private final int[] indices;
-    private final Texture texture;
+    private final TexturePack texturePack;
     private final Shader shader;
     private int vao;
     private int vbo;
     private int ebo;
 
-    public Mesh(float[] verticesArray, int[] indicesArray, Texture textureObject, Shader shaderObject) {
+    public Mesh(float[] verticesArray, int[] indicesArray, TexturePack texturePackObject, Shader shaderObject) {
         vertices = verticesArray;
         indices = indicesArray;
-        texture = textureObject;
+        texturePack = texturePackObject;
         shader = shaderObject;
     }
 
@@ -55,11 +55,6 @@ public class Mesh {
     public void bind() {
         glBindVertexArray(vao);
         shader.use();
-
-        // diffuseTexture
-        texture.bind(GL_TEXTURE0);
-        glUniform1i(shader.getUniformLocation("diffuseTexture"), 0);
-        // specularTexture
-        // normalMap
+        texturePack.bind(shader);
     }
 }

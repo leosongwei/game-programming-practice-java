@@ -3,6 +3,7 @@ package test04lightmapping;
 import model.Mesh;
 import model.Shader;
 import model.Texture;
+import model.TexturePack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -48,13 +49,16 @@ public class TestLightMapping {
         return new Shader(vertexShader, fragmentShader);
     }
 
-    private static Mesh setupMesh(Shader shader) {
+    private static Mesh setupMesh(Shader shader) throws Exception {
         Shape cube = new Cube();
         Texture texture = new Texture("th06.png");
+        TexturePack texturePack = new TexturePack(
+                new String[]{"container2.png", "container2_specular.png"}
+        );
         Mesh mesh = new Mesh(
                 cube.getVertices(),
                 cube.getIndices(),
-                texture,
+                texturePack,
                 shader
         );
         mesh.setup();
