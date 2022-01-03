@@ -29,6 +29,7 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
 
     implementation "org.joml:joml:1.10.3"
+    implementation files('/usr/share/java/opencv4/opencv-451.jar')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'

@@ -1,5 +1,7 @@
 package model;
 
+import java.nio.FloatBuffer;
+
 import static org.lwjgl.opengl.GL46.*;
 
 public class Shader {
@@ -19,6 +21,16 @@ public class Shader {
 
     public int getUniformLocation(String name) {
         return glGetUniformLocation(programID, name);
+    }
+
+    public void uniformMatrix4fv(String name, FloatBuffer buffer) {
+        int position = getUniformLocation(name);
+        glUniformMatrix4fv(position, false, buffer);
+    }
+
+    public void uniform3fv(String name, FloatBuffer buffer) {
+        int position = getUniformLocation(name);
+        glUniform3fv(position, buffer);
     }
 
     private static int compileShaderFromString(int shaderType, String shaderProgram) throws Exception {
