@@ -99,7 +99,7 @@ public class TestLightMapping {
                     float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
                     vec3 colorSpecular = lightColor * spec * texture(TEXTURE1, fragUV).rgb;
                     
-                    color = colorAmbient + colorDiffuse + colorSpecular;
+                    color = (colorAmbient + colorDiffuse + colorSpecular) * 2;
                 }
                                 """;
         return new Shader(vertexShader, fragmentShader);
