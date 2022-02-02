@@ -1,5 +1,9 @@
 package model;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
+
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL46.*;
@@ -23,9 +27,25 @@ public class Shader {
         return glGetUniformLocation(programID, name);
     }
 
+    public void uniformMatrix4fv(String name, Matrix4f matrix) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            uniformMatrix4fv(name, matrix, stack);
+        }
+    }
+
+    public void uniformMatrix4fv(String name, Matrix4f matrix, MemoryStack stack) {
+        FloatBuffer buffer = matrix.get(stack.mallocFloat(16));
+        uniformMatrix4fv(name, buffer);
+    }
+
     public void uniformMatrix4fv(String name, FloatBuffer buffer) {
         int position = getUniformLocation(name);
         glUniformMatrix4fv(position, false, buffer);
+    }
+
+    public void uniform3fv(String name, Vector3f vector, MemoryStack stack) {
+        FloatBuffer buffer = vector.get(stack.mallocFloat(3));
+        uniform3fv(name, buffer);
     }
 
     public void uniform3fv(String name, FloatBuffer buffer) {

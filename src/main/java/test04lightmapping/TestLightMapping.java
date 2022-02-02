@@ -75,6 +75,7 @@ public class TestLightMapping {
                 #version 330 core
                 uniform sampler2D TEXTURE0;
                 uniform sampler2D TEXTURE1;
+                uniform sampler2D TEXTURE2;
                 uniform vec3 lightPos;
                 uniform vec3 eyePos;
                 
@@ -108,7 +109,7 @@ public class TestLightMapping {
     private static Mesh setupMesh(Shader shader) throws Exception {
         Shape cube = new Cube();
         TexturePack texturePack = new TexturePack(
-                new String[]{"container2.png", "container2_specular.png"}
+                new String[]{"container2.png", "container2_specular.png", "container2_normal.png"}
         );
         Mesh mesh = new Mesh(
                 cube.getVertices(),
@@ -192,46 +193,18 @@ public class TestLightMapping {
                     );
 
                     boxMesh.bind();
-                    FloatBuffer perspectiveMatrix = projectionLook.get(stack.mallocFloat(16));
-                    glUniformMatrix4fv(
-                            boxShader.getUniformLocation("projectionLook"),
-                            false,
-                            perspectiveMatrix
-                    );
-
-                    FloatBuffer boxTranslation = new Matrix4f().get(stack.mallocFloat(16));
-                    glUniformMatrix4fv(
-                            boxShader.getUniformLocation("modelTransform"),
-                            false,
-                            boxTranslation
-                    );
-                    FloatBuffer lightPosition = lightSourcePosition.get(stack.mallocFloat(3));
-                    glUniform3fv(
-                            boxShader.getUniformLocation("lightPos"),
-                            lightPosition
-                    );
-                    FloatBuffer eyePos = eyePosition.get(stack.mallocFloat(3));
-                    glUniform3fv(
-                            boxShader.getUniformLocation("eyePos"),
-                            eyePos
-                    );
+                    boxShader.uniformMatrix4fv("projectionLook", projectionLook, stack);
+                    boxShader.uniformMatrix4fv("modelTransform", new Matrix4f(), stack);
+                    boxShader.uniform3fv("lightPos", lightSourcePosition, stack);
+                    boxShader.uniform3fv("eyePos", eyePosition, stack);
                     boxMesh.draw();
 
                     lightSourceMesh.bind();
-                    FloatBuffer lightSourceTranslation = new Matrix4f()
+                    lightSourceShader.uniformMatrix4fv("projectionLook", projectionLook, stack);
+                    Matrix4f lightSourceTranslation = new Matrix4f()
                             .translation(lightSourcePosition)
-                            .scale(0.1f)
-                            .get(stack.mallocFloat(16));
-                    glUniformMatrix4fv(
-                            lightSourceShader.getUniformLocation("projectionLook"),
-                            false,
-                            perspectiveMatrix
-                    );
-                    glUniformMatrix4fv(
-                            lightSourceShader.getUniformLocation("modelTransform"),
-                            false,
-                            lightSourceTranslation
-                    );
+                            .scale(0.1f);
+                    lightSourceShader.uniformMatrix4fv("modelTransform", lightSourceTranslation, stack);
                     lightSourceMesh.draw();
                 }
 
